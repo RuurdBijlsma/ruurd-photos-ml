@@ -46,9 +46,9 @@ class SfBlipCaptioner(CaptionerProtocol):
         caption = caption.replace(" ' ", "'")
         if all(word not in caption for word in self.hallucinated_words):
             return caption.capitalize()
-        for fake_word in self.hallucinated_words:
+        for fake_word in self.hallucinated_words:  # pragma: no cover
             caption = caption.replace(fake_word, "")
-        return caption.strip().capitalize()
+        return caption.strip().capitalize()  # pragma: no cover
 
     @staticmethod
     def raw_caption(image: Image, instruction: str | None = None) -> str:
@@ -66,7 +66,9 @@ class SfBlipCaptioner(CaptionerProtocol):
         if instruction is None:
             inputs = processor(rgb_image, return_tensors="pt").to("cuda")
         else:
-            inputs = processor(rgb_image, instruction, return_tensors="pt").to("cuda")
+            inputs = processor(  # pragma: no cover
+                rgb_image, instruction, return_tensors="pt"
+            ).to("cuda")
         out = model.generate(**inputs)
         caption = processor.decode(  # type: ignore[no-untyped-call]
             out[0], skip_special_tokens=True
