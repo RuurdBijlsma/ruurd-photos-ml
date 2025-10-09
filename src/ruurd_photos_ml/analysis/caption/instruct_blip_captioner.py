@@ -19,12 +19,12 @@ def get_instruct_blip_assets() -> tuple[
     print(f"Loading InstructBLIP model on device: '{device}'")
 
     # We use the Flan-T5-XL based model.
-    # torch_dtype=torch.float16 significantly reduces VRAM and increases speed.
     processor = InstructBlipProcessor.from_pretrained(  # type: ignore[no-untyped-call]
-        "Salesforce/instructblip-flan-t5-xl"
+        "Salesforce/instructblip-flan-t5-xl", use_fast=True
     )
+
     model = InstructBlipForConditionalGeneration.from_pretrained(
-        "Salesforce/instructblip-flan-t5-xl", torch_dtype=torch.float16
+        "Salesforce/instructblip-flan-t5-xl", dtype=torch.float16
     ).to(device)
     model.eval()  # Set model to evaluation mode
 
