@@ -1,4 +1,5 @@
 """Tests for ruurd_photos_ml."""
+import pytest
 
 from ruurd_photos_ml import get_captioner, get_facial_recognition, get_object_detection, get_ocr
 from ruurd_photos_ml.analysis.caption.protocol import CaptionerProvider
@@ -46,6 +47,7 @@ def test_facial_recognition_2() -> None:
     assert len(faces) == expected_face_count
 
 
+@pytest.mark.cuda
 def test_captioner_blip_instruct() -> None:
     """Test blip instruct captioner."""
     horse_image = get_test_image("paard.jpg")
