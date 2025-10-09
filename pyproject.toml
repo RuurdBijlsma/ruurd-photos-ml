@@ -1,6 +1,6 @@
 [project]
 name = "ruurd-photos-ml"
-version = "0.1.1"
+version = "0.1.2"
 description = "Some image related machine learning methods, to be used by Ruurd Photos."
 readme = "README.md"
 license = "MIT"
@@ -16,7 +16,8 @@ dependencies = [
     "insightface>=0.7.3",
     "opencv-python>=4.12.0.88",
     "pytesseract>=0.3.13",
-    "onnxruntime>=1.23.1",
+    "torchvision>=0.23.0",
+    "onnxruntime-gpu>=1.23.0",
 ]
 
 [project.urls]
@@ -29,7 +30,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-exclude = ["tests", "examples", ".github", ".pre-commit-config.yaml", ".pylintrc", "pytest.ini", "TODO.md"]
+exclude = ["tests", ".github", ".pre-commit-config.yaml", ".pylintrc", "pytest.ini"]
 
 [tool.uv.sources]
 torch = [
