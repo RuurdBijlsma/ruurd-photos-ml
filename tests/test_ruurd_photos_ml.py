@@ -62,6 +62,7 @@ def test_captioner_blip_instruct() -> None:
     assert "horse" in animal_type.lower()
 
 
+@pytest.mark.cuda
 def test_captioner_sf() -> None:
     """Test salesforce captioner."""
     horse_image = get_test_image("paard.jpg")

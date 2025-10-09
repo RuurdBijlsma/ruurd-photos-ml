@@ -36,8 +36,6 @@ def get_instruct_blip_assets() -> tuple[
 class InstructBlipCaptioner(CaptionerProtocol):
     """Captioner implementation using the InstructBLIP model."""
 
-    hallucinated_words: ClassVar[list[str]] = ["arafed", "araffe"]
-
     def caption(self, image: Image, instruction: str | None = None) -> str:
         """Generate a caption for the given image based on an instruction.
 
@@ -53,18 +51,7 @@ class InstructBlipCaptioner(CaptionerProtocol):
         if instruction is None:
             instruction = "Provide a brief, one-sentence description of this image."
 
-        raw_text = self.raw_caption(image, instruction)
-
-        # Post-processing can be useful for any model
-        processed_text = raw_text.replace(" ' ", "'")
-
-        if all(word not in processed_text for word in self.hallucinated_words):
-            return processed_text.capitalize()
-
-        for fake_word in self.hallucinated_words:
-            processed_text = processed_text.replace(fake_word, "")
-
-        return processed_text.strip().capitalize()
+        return self.raw_caption(image, instruction)
 
     def raw_caption(self, image: Image, instruction: str) -> str:
         """Generate a raw caption for the image using the InstructBlip model.
