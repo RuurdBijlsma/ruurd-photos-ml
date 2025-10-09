@@ -1,4 +1,5 @@
 """Tests for ruurd_photos_ml."""
+
 import pytest
 
 from ruurd_photos_ml import get_captioner, get_facial_recognition, get_object_detection, get_ocr
