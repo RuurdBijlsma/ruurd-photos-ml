@@ -62,7 +62,7 @@ def get_captioner(
     }[provider]()
 
 
-def get_embedder(provider: EmbedderProvider) -> EmbedderProtocol:
+def get_embedder(provider: EmbedderProvider = EmbedderProvider.OPEN_CLIP) -> EmbedderProtocol:
     """Get the LLM by the provider."""
     return {
         EmbedderProvider.OPEN_CLIP: OpenCLIPEmbedder,

@@ -1,8 +1,6 @@
 # Ruurd Photos ML
 
-[![PyPI version](https://badge.fury.io/py/ruurd-photos-ml.svg)](https://badge.fury.io/py/ruurd-photos-ml)
-[![Python Quality Checks](https://github.com/RuurdBijlsma/ruurd-photos-ml/.github/workflows/quality-check.yaml/badge.svg)](https://github.com/RuurdBijlsma/ruurd-photos-ml/.github/workflows/quality-check.yaml)
-[![codecov](https://codecov.io/gh/RuurdBijlsma/ruurd-photos-ml/branch/main/graph/badge.svg)](https://codecov.io/gh/RuurdBijlsma/ruurd-photos-ml)
+[![Python Quality Checks](https://github.com/RuurdBijlsma/ruurd-photos-ml/actions/workflows/quality-checks.yaml/badge.svg)](https://github.com/RuurdBijlsma/ruurd-photos-ml/actions/workflows/quality-checks.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Python package providing a suite of machine learning tools for image analysis, designed to be the
