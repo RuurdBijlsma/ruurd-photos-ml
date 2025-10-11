@@ -1,3 +1,4 @@
+from ruurd_photos_ml import EmbedderProtocol, EmbedderProvider
 from ruurd_photos_ml.analysis.caption.instruct_blip_captioner import (
     InstructBlipCaptioner,
 )
@@ -6,6 +7,8 @@ from ruurd_photos_ml.analysis.caption.protocol import (
     CaptionerProvider,
 )
 from ruurd_photos_ml.analysis.caption.sf_blip_captioner import SfBlipCaptioner
+from ruurd_photos_ml.analysis.embedding.open_clip_embedder import OpenCLIPEmbedder
+from ruurd_photos_ml.analysis.embedding.zero_clip_embedder import ZeroCLIPEmbedder
 from ruurd_photos_ml.analysis.facial_recognition.insight_facial_recognition import (
     InsightFacialRecognition,
 )
@@ -56,4 +59,12 @@ def get_captioner(
     return {
         CaptionerProvider.SF_BLIP: SfBlipCaptioner,
         CaptionerProvider.BLIP_INSTRUCT: InstructBlipCaptioner,
+    }[provider]()
+
+
+def get_embedder(provider: EmbedderProvider) -> EmbedderProtocol:
+    """Get the LLM by the provider."""
+    return {
+        EmbedderProvider.OPEN_CLIP: OpenCLIPEmbedder,
+        EmbedderProvider.ZERO_CLIP: ZeroCLIPEmbedder,
     }[provider]()
