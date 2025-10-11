@@ -1,6 +1,5 @@
 # Ruurd Photos ML
 
-[![PyPI version](https://badge.fury.io/py/ruurd-photos-ml.svg)](https://badge.fury.io/py/ruurd-photos-ml)
 [![Python Quality Checks](https://github.com/RuurdBijlsma/ruurd-photos-ml/actions/workflows/quality-checks.yaml/badge.svg)](https://github.com/RuurdBijlsma/ruurd-photos-ml/actions/workflows/quality-checks.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
