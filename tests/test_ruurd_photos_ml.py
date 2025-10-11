@@ -1,13 +1,59 @@
 """Tests for ruurd_photos_ml."""
 
+import numpy as np
 import pytest
 
-from ruurd_photos_ml import get_captioner, get_facial_recognition, get_object_detection, get_ocr
-from ruurd_photos_ml.analysis.caption.protocol import CaptionerProvider
-from ruurd_photos_ml.analysis.facial_recognition.protocol import FacialRecognitionProvider
-from ruurd_photos_ml.analysis.object_detection.protocol import ObjectDetectionProvider
-from ruurd_photos_ml.analysis.ocr.protocol import OCRProvider
+from ruurd_photos_ml import (
+    CaptionerProvider,
+    EmbedderProvider,
+    FacialRecognitionProvider,
+    ObjectDetectionProvider,
+    OCRProvider,
+    get_captioner,
+    get_embedder,
+    get_facial_recognition,
+    get_object_detection,
+    get_ocr,
+)
 from tests.helpers.get_test_image import get_test_image
+
+
+@pytest.mark.parametrize("provider", [EmbedderProvider.OPEN_CLIP, EmbedderProvider.ZERO_CLIP])
+def test_embedder_sorted(provider: EmbedderProvider) -> None:
+    """Test embedder and print texts sorted by their similarity to the image."""
+    tent_image = get_test_image("tent.jpg")
+    embedder = get_embedder(provider)
+    image_embedding = embedder.embed_image(tent_image)
+
+    texts = [
+        "an image of a campsite with a car parked.",
+        "A tent",
+        "a beautiful sunset over a city next to a sea.",
+        "A sunset over the ocean.",
+        "An portrait of an old man.",
+        "A portrait of walter white from breaking bad",
+        "An image of a horse laying on a sand floor, with grass in the background.",
+        "Image of a horse.",
+    ]
+    text_embeddings = embedder.embed_texts(texts)
+
+    # Calculate cosine similarity (dot product).
+    # Since the embedder already normalizes the vectors, this is sufficient.
+    similarities = np.dot(text_embeddings, image_embedding.T)
+
+    # Combine the texts and their similarity scores
+    scored_texts = list(zip(texts, similarities, strict=False))
+
+    # Sort the list of (text, score) tuples in descending order based on the score
+    sorted_scored_texts = sorted(scored_texts, key=lambda item: item[1], reverse=True)
+
+    print("Texts sorted by similarity to the image:")
+    # Print the sorted list
+    for text, score in sorted_scored_texts:
+        print(f"Score: {score:.4f} - '{text}'")
+
+    assert "campsite" in sorted_scored_texts[0][0]
+    assert "tent" in sorted_scored_texts[1][0]
 
 
 def test_ocr() -> None:

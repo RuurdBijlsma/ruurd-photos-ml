@@ -37,7 +37,7 @@ jobs:
       - name: Type check with mypy
         run: uv run mypy . --strict --ignore-missing-imports
 
-      - name: Install Tesseract & ExifTool
+      - name: Install Tesseract
         run: |
           sudo apt update
           sudo apt install -y tesseract-ocr
