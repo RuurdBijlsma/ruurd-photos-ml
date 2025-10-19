@@ -102,10 +102,11 @@ def test_captioner_blip_instruct() -> None:
     caption = captioner.caption(horse_image)
     assert "horse" in caption.lower()
     assert "sand" in caption.lower()
-    is_animal = captioner.caption(horse_image, "Is this an animal? yes or no.")
+    is_animal = captioner.caption(horse_image, "Question: Is this an animal? yes or no. Answer:")
     assert "yes" in is_animal.lower()
-    animal_type = captioner.caption(horse_image, "What animal is this?")
+    animal_type = captioner.caption(horse_image, "Question: What animal is this? Answer:")
     assert "horse" in animal_type.lower()
+
 
 
 @pytest.mark.cuda
