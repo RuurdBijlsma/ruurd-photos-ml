@@ -117,3 +117,10 @@ def test_captioner_sf() -> None:
     caption = captioner.caption(horse_image)
     assert "horse" in caption.lower()
     # sf captioner can't really do question & answer, so it's not tested.
+
+
+
+@pytest.mark.cuda
+def test_gemma_llm() -> None:
+    """Test gemma llm."""
+    #todo imlement this test

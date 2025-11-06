@@ -16,6 +16,8 @@ from ruurd_photos_ml.analysis.facial_recognition.protocol import (
     FacialRecognitionProtocol,
     FacialRecognitionProvider,
 )
+from ruurd_photos_ml.analysis.llm.gemma_llm import GemmaLLM
+from ruurd_photos_ml.analysis.llm.protocol import LLMProvider, LLMProtocol
 from ruurd_photos_ml.analysis.object_detection.protocol import (
     ObjectDetectionProtocol,
     ObjectDetectionProvider,
@@ -67,4 +69,11 @@ def get_embedder(provider: EmbedderProvider = EmbedderProvider.OPEN_CLIP) -> Emb
     return {
         EmbedderProvider.OPEN_CLIP: OpenCLIPEmbedder,
         EmbedderProvider.ZERO_CLIP: ZeroCLIPEmbedder,
+    }[provider]()
+
+
+def get_llm(provider: LLMProvider = LLMProvider.GEMMA_3_12B_4BIT) -> LLMProtocol:
+    """Get the LLM by the provider."""
+    return {
+        LLMProvider.GEMMA_3: GemmaLLM,
     }[provider]()
