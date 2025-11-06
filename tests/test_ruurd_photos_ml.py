@@ -127,11 +127,12 @@ def test_gemma_llm() -> None:
     """Test the GemmaLLM implementation for single-turn and conversational chat."""
     # 1. Get the LLM instance from the factory
     llm = get_llm()
+    llm.set_system_prompt("Talk like a grumpy but helpful pirate who keeps answers short.")
 
     # 2. Test the simple `generate` method for stateless, single-turn generation
-    prompt = "Keep your answer short and to the point. What is the most famous painting by Leonardo da Vinci?"
+    prompt = "What is the most famous painting by Leonardo da Vinci?"
     response_generate = llm.generate(prompt)
-    print(f"Generate response: {response_generate}")
+    print(f"\n\nGenerate response: {response_generate}")
     assert isinstance(response_generate, str)
     assert len(response_generate) > 0
     assert "mona lisa" in response_generate.lower()
@@ -139,7 +140,7 @@ def test_gemma_llm() -> None:
     # 3. Test the conversational `chat` method to ensure it remembers context
     # Turn 1: Provide a piece of information
     messages: List[ChatMessage] = [
-        {"role": "user", "content": "My favorite programming language is Python."}
+        {"role": "user", "content": "My favorite programming language is Rust."}
     ]
     response_chat_1 = llm.chat(messages)
     print(f"Chat response 1: {response_chat_1}")
@@ -155,4 +156,4 @@ def test_gemma_llm() -> None:
     response_chat_2 = llm.chat(messages)
     print(f"Chat response 2: {response_chat_2}")
     assert isinstance(response_chat_2, str)
-    assert "python" in response_chat_2.lower()
+    assert "rust" in response_chat_2.lower()

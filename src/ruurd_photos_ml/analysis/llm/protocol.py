@@ -7,7 +7,7 @@ from typing import List, Protocol, TypedDict
 class ChatMessage(TypedDict):
     """
     Represents a single message in a chat conversation.
-    The 'role' can be 'user', 'assistant', or 'system'.
+    The 'role' can be 'user', 'assistant'.
     """
     role: str
     content: str
@@ -39,6 +39,9 @@ class LLMProtocol(Protocol):
             The generated text response from the assistant.
         """
         ...
+
+    def set_system_prompt(self, system_prompt: str | None) -> None:
+        """Set the system prompt."""
 
 
 class LLMProvider(StrEnum):

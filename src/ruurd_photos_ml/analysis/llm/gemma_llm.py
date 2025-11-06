@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List
+from typing import List, Optional
 
 import torch
 from transformers import AutoTokenizer, Gemma3ForCausalLM, PreTrainedTokenizer
@@ -37,6 +37,11 @@ class GemmaLLM(LLMProtocol):
     and conversational chat, leveraging the Hugging Face transformers library.
     """
 
+    _system_prompt: str | None = None
+
+    def set_system_prompt(self, system_prompt: str | None) -> None:
+        self._system_prompt = system_prompt
+
     def generate(self, prompt: str) -> str:
         """
         Generates a text response for a single, stateless prompt.
@@ -63,8 +68,25 @@ class GemmaLLM(LLMProtocol):
         """
         model, tokenizer = get_model_and_tokenizer()
 
+        # By default, use the original messages list
+        processed_messages = messages
+
+        # If a system prompt is set and there are messages, prepend it to the first message.
+        if self._system_prompt and messages:
+            # Create a shallow copy of the messages list to avoid modifying the original
+            processed_messages = list(messages)
+
+            # Create a copy of the first message dictionary to avoid side effects
+            first_message = processed_messages[0].copy()
+
+            # Prepend the system prompt to the content of the copied first message
+            first_message['content'] = f"{self._system_prompt}\n\n{first_message['content']}"
+
+            # Replace the first message in our new list with the modified copy
+            processed_messages[0] = first_message
+
         prompt = tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
+            processed_messages, tokenize=False, add_generation_prompt=True
         )
 
         # Encode the formatted prompt
@@ -74,6 +96,7 @@ class GemmaLLM(LLMProtocol):
             truncation=True,
             max_length=MAX_CONTEXT_TOKENS - MAX_NEW_TOKENS
         ).to(model.device)
+
         # Generate a response
         with torch.inference_mode():
             pad_token_id = tokenizer.pad_token_id or tokenizer.eos_token_id
