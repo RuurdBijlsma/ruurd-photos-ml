@@ -1,6 +1,6 @@
 [project]
 name = "ruurd-photos-ml"
-version = "0.2.1"
+version = "0.2.2"
 description = "Some image related machine learning methods, to be used by Ruurd Photos."
 readme = "README.md"
 license = "MIT"

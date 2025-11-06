@@ -13,7 +13,7 @@ from ruurd_photos_ml import (
     get_captioner,
     get_embedder,
     get_facial_recognition,
-    get_llm,  # Import the new getter
+    get_llm,
     get_object_detection,
     get_ocr,
 )

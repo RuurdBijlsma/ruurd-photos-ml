@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from open_clip import CLIP, SimpleTokenizer, create_model_and_transforms, get_tokenizer
 from torchvision.transforms import Compose
 
-from ruurd_photos_ml import EmbedderProtocol
+from ruurd_photos_ml.analysis.embedding.protocol import EmbedderProtocol
 
 
 @lru_cache

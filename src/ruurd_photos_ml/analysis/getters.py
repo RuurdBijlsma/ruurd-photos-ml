@@ -1,4 +1,3 @@
-from ruurd_photos_ml import EmbedderProtocol, EmbedderProvider
 from ruurd_photos_ml.analysis.caption.instruct_blip_captioner import (
     InstructBlipCaptioner,
 )
@@ -8,6 +7,7 @@ from ruurd_photos_ml.analysis.caption.protocol import (
 )
 from ruurd_photos_ml.analysis.caption.sf_blip_captioner import SfBlipCaptioner
 from ruurd_photos_ml.analysis.embedding.open_clip_embedder import OpenCLIPEmbedder
+from ruurd_photos_ml.analysis.embedding.protocol import EmbedderProtocol, EmbedderProvider
 from ruurd_photos_ml.analysis.embedding.zero_clip_embedder import ZeroCLIPEmbedder
 from ruurd_photos_ml.analysis.facial_recognition.insight_facial_recognition import (
     InsightFacialRecognition,

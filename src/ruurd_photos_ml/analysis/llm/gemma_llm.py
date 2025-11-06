@@ -17,7 +17,7 @@ def get_model_and_tokenizer() -> tuple[Gemma3ForCausalLM, PreTrainedTokenizer]:
         A tuple containing the Gemma model and its tokenizer.
     """
     model_name = "google/gemma-3-4b-it"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)  # type: ignore[no-untyped-call]
     model = Gemma3ForCausalLM.from_pretrained(
         model_name,
         dtype=torch.bfloat16,
@@ -84,7 +84,9 @@ class GemmaLLM(LLMProtocol):
             processed_messages[0] = first_message
 
         prompt = tokenizer.apply_chat_template(
-            processed_messages, tokenize=False, add_generation_prompt=True
+            processed_messages,  # type: ignore[arg-type]
+            tokenize=False,
+            add_generation_prompt=True,
         )
 
         # Encode the formatted prompt

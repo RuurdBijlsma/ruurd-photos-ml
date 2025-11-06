@@ -26,7 +26,6 @@ class LLMProtocol(Protocol):
         Returns:
             The generated text response as a string.
         """
-        ...
 
     def chat(self, messages: list[ChatMessage]) -> str:
         """Generates a response for a conversational chat history.
@@ -37,7 +36,6 @@ class LLMProtocol(Protocol):
         Returns:
             The generated text response from the assistant.
         """
-        ...
 
     def set_system_prompt(self, system_prompt: str | None) -> None:
         """Set the system prompt."""
