@@ -3,3 +3,4 @@ dist
 docs
 __pycache__
 .coverage
+unsloth_compiled_cache

@@ -1,62 +1,45 @@
-# llm/gemma_llm.py
-
 from functools import lru_cache
-from typing import Tuple
+from typing import List
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedModel, PreTrainedTokenizer
+from transformers import AutoTokenizer, Gemma3ForCausalLM, PreTrainedTokenizer
 
-# Make sure to import your new protocol
-from .protocol import LLMProtocol
+from .protocol import ChatMessage, LLMProtocol
+
+MAX_NEW_TOKENS = 512
+MAX_CONTEXT_TOKENS = 4096
 
 
-@lru_cache(maxsize=None)
-def get_model_and_tokenizer() -> Tuple[PreTrainedModel, PreTrainedTokenizer]:
+@lru_cache
+def get_model_and_tokenizer() -> tuple[Gemma3ForCausalLM, PreTrainedTokenizer]:
     """
-    Retrieve and cache the Gemma model and tokenizer.
-    This function is cached to ensure the model is loaded into memory only once.
+    Retrieve and cache the Gemma-3-4B-it model and tokenizer.
 
     Returns:
-        A tuple containing the loaded model and tokenizer.
+        A tuple containing the Gemma model and its tokenizer.
     """
-    model_id = "unsloth/gemma-3-12b-it-unsloth-bnb-4bit"
-
-    print(f"Loading model and tokenizer for '{model_id}'...")
-
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        device_map="auto",  # Automatically use GPU if available
-        torch_dtype=torch.bfloat16,  # Recommended for modern GPUs
-        load_in_4bit=True,  # Enable 4-bit quantization
+    model_name = "google/gemma-3-4b-it"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = Gemma3ForCausalLM.from_pretrained(
+        model_name,
+        dtype=torch.bfloat16,
+        device_map="auto",
     )
-    print("Model and tokenizer loaded successfully.")
+    model.eval()
     return model, tokenizer
 
 
 class GemmaLLM(LLMProtocol):
     """
-    An implementation of the LLMProtocol using the 4-bit quantized Gemma 3 12B model.
+    LLM implementation for the Gemma 3 4B instruction-tuned model.
+
+    This class provides methods for both single-turn text generation
+    and conversational chat, leveraging the Hugging Face transformers library.
     """
-
-    def __init__(self, max_new_tokens: int = 200, temperature: float = 0.7):
-        """
-        Initializes the GemmaLLM.
-
-        Args:
-            max_new_tokens: The maximum number of new tokens to generate.
-            temperature: The temperature for sampling-based generation.
-        """
-        self.model, self.tokenizer = get_model_and_tokenizer()
-        self.max_new_tokens = max_new_tokens
-        self.temperature = temperature
-        # Using self.model.device is robust, as device_map="auto" handles placement
-        self.device = self.model.device
 
     def generate(self, prompt: str) -> str:
         """
-        Generates a text response based on the given prompt.
+        Generates a text response for a single, stateless prompt.
 
         Args:
             prompt: The input text to the model.
@@ -64,24 +47,49 @@ class GemmaLLM(LLMProtocol):
         Returns:
             The generated text response as a string.
         """
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        return self.chat([
+            ChatMessage(role="user", content=prompt),
+        ])
 
-        with torch.no_grad():
-            outputs = self.model.generate(
-                **inputs,
-                max_new_tokens=self.max_new_tokens,
+    def chat(self, messages: List[ChatMessage]) -> str:
+        """
+        Generates a response for a conversational chat history.
+
+        Args:
+            messages: A list of ChatMessage objects representing the conversation history.
+
+        Returns:
+            The generated text response from the assistant.
+        """
+        model, tokenizer = get_model_and_tokenizer()
+
+        prompt = tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+
+        # Encode the formatted prompt
+        input_ids = tokenizer(
+            prompt,
+            return_tensors="pt",
+            truncation=True,
+            max_length=MAX_CONTEXT_TOKENS - MAX_NEW_TOKENS
+        ).to(model.device)
+        # Generate a response
+        with torch.inference_mode():
+            pad_token_id = tokenizer.pad_token_id or tokenizer.eos_token_id
+            outputs = model.generate(
+                **input_ids,
+                max_new_tokens=MAX_NEW_TOKENS,
                 do_sample=True,
-                temperature=self.temperature,
-                top_p=0.95,
+                temperature=0.7,
                 top_k=50,
+                top_p=0.95,
+                pad_token_id=pad_token_id,
+                min_new_tokens=1,
             )
+        # Decode the full output and extract only the newly generated part
+        input_len = input_ids["input_ids"].shape[-1]
 
-        # Decode the output and skip any special tokens (e.g., padding)
-        decoded_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-        # Clean the output by removing the original prompt
-        # Models often include the prompt in their response.
-        if decoded_text.startswith(prompt):
-            return decoded_text[len(prompt):].strip()
-
-        return decoded_text.strip()
+        # Decode only the newly generated tokens
+        decoded = tokenizer.decode(outputs[0][input_len:], skip_special_tokens=True)
+        return decoded.strip()

@@ -72,7 +72,7 @@ def get_embedder(provider: EmbedderProvider = EmbedderProvider.OPEN_CLIP) -> Emb
     }[provider]()
 
 
-def get_llm(provider: LLMProvider = LLMProvider.GEMMA_3_12B_4BIT) -> LLMProtocol:
+def get_llm(provider: LLMProvider = LLMProvider.GEMMA_3) -> LLMProtocol:
     """Get the LLM by the provider."""
     return {
         LLMProvider.GEMMA_3: GemmaLLM,
