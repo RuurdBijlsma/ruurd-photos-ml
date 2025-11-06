@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 from PIL.Image import Image
 from transformers import CLIPModel, CLIPProcessor, PreTrainedModel
 
-from ruurd_photos_ml import EmbedderProtocol
+from ruurd_photos_ml.analysis.embedding.protocol import EmbedderProtocol
 
 
 @lru_cache

@@ -1,4 +1,3 @@
-from ruurd_photos_ml import EmbedderProtocol, EmbedderProvider
 from ruurd_photos_ml.analysis.caption.instruct_blip_captioner import (
     InstructBlipCaptioner,
 )
@@ -8,6 +7,7 @@ from ruurd_photos_ml.analysis.caption.protocol import (
 )
 from ruurd_photos_ml.analysis.caption.sf_blip_captioner import SfBlipCaptioner
 from ruurd_photos_ml.analysis.embedding.open_clip_embedder import OpenCLIPEmbedder
+from ruurd_photos_ml.analysis.embedding.protocol import EmbedderProtocol, EmbedderProvider
 from ruurd_photos_ml.analysis.embedding.zero_clip_embedder import ZeroCLIPEmbedder
 from ruurd_photos_ml.analysis.facial_recognition.insight_facial_recognition import (
     InsightFacialRecognition,
@@ -16,6 +16,8 @@ from ruurd_photos_ml.analysis.facial_recognition.protocol import (
     FacialRecognitionProtocol,
     FacialRecognitionProvider,
 )
+from ruurd_photos_ml.analysis.llm.gemma_llm import GemmaLLM
+from ruurd_photos_ml.analysis.llm.protocol import LLMProtocol, LLMProvider
 from ruurd_photos_ml.analysis.object_detection.protocol import (
     ObjectDetectionProtocol,
     ObjectDetectionProvider,
@@ -67,4 +69,11 @@ def get_embedder(provider: EmbedderProvider = EmbedderProvider.OPEN_CLIP) -> Emb
     return {
         EmbedderProvider.OPEN_CLIP: OpenCLIPEmbedder,
         EmbedderProvider.ZERO_CLIP: ZeroCLIPEmbedder,
+    }[provider]()
+
+
+def get_llm(provider: LLMProvider = LLMProvider.GEMMA_3) -> LLMProtocol:
+    """Get the LLM by the provider."""
+    return {
+        LLMProvider.GEMMA_3: GemmaLLM,
     }[provider]()

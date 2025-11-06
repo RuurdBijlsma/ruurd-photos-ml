@@ -5,6 +5,7 @@ import pytest
 
 from ruurd_photos_ml import (
     CaptionerProvider,
+    ChatMessage,
     EmbedderProvider,
     FacialRecognitionProvider,
     ObjectDetectionProvider,
@@ -12,6 +13,7 @@ from ruurd_photos_ml import (
     get_captioner,
     get_embedder,
     get_facial_recognition,
+    get_llm,
     get_object_detection,
     get_ocr,
 )
@@ -102,9 +104,9 @@ def test_captioner_blip_instruct() -> None:
     caption = captioner.caption(horse_image)
     assert "horse" in caption.lower()
     assert "sand" in caption.lower()
-    is_animal = captioner.caption(horse_image, "Is this an animal? yes or no.")
+    is_animal = captioner.caption(horse_image, "Question: Is this an animal? yes or no. Answer:")
     assert "yes" in is_animal.lower()
-    animal_type = captioner.caption(horse_image, "What animal is this?")
+    animal_type = captioner.caption(horse_image, "Question: What animal is this? Answer:")
     assert "horse" in animal_type.lower()
 
 
@@ -116,3 +118,40 @@ def test_captioner_sf() -> None:
     caption = captioner.caption(horse_image)
     assert "horse" in caption.lower()
     # sf captioner can't really do question & answer, so it's not tested.
+
+
+@pytest.mark.cuda
+def test_gemma_llm() -> None:
+    """Test the GemmaLLM implementation for single-turn and conversational chat."""
+    # 1. Get the LLM instance from the factory
+    llm = get_llm()
+    llm.set_system_prompt("Talk like a grumpy but helpful pirate who keeps answers short.")
+
+    # 2. Test the simple `generate` method for stateless, single-turn generation
+    prompt = "What is the most famous painting by Leonardo da Vinci?"
+    response_generate = llm.generate(prompt)
+    print(f"\n\nGenerate response: {response_generate}")
+    assert isinstance(response_generate, str)
+    assert len(response_generate) > 0
+    assert "mona lisa" in response_generate.lower()
+
+    # 3. Test the conversational `chat` method to ensure it remembers context
+    # Turn 1: Provide a piece of information
+    messages: list[ChatMessage] = [
+        {"role": "user", "content": "My favorite programming language is Rust."}
+    ]
+    response_chat_1 = llm.chat(messages)
+    print(f"Chat response 1: {response_chat_1}")
+    assert isinstance(response_chat_1, str)
+    assert len(response_chat_1) > 0
+
+    # Append the assistant's response to the history to maintain context
+    messages.append({"role": "assistant", "content": response_chat_1})
+
+    # Turn 2: Ask a question that requires recalling the information from Turn 1
+    messages.append({"role": "user", "content": "What is my favorite language?"})
+
+    response_chat_2 = llm.chat(messages)
+    print(f"Chat response 2: {response_chat_2}")
+    assert isinstance(response_chat_2, str)
+    assert "rust" in response_chat_2.lower()
