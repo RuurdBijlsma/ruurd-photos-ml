@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import List, Optional
 
 import torch
 from transformers import AutoTokenizer, Gemma3ForCausalLM, PreTrainedTokenizer
@@ -12,8 +11,7 @@ MAX_CONTEXT_TOKENS = 4096
 
 @lru_cache
 def get_model_and_tokenizer() -> tuple[Gemma3ForCausalLM, PreTrainedTokenizer]:
-    """
-    Retrieve and cache the Gemma-3-4B-it model and tokenizer.
+    """Retrieve and cache the Gemma-3-4B-it model and tokenizer.
 
     Returns:
         A tuple containing the Gemma model and its tokenizer.
@@ -30,8 +28,7 @@ def get_model_and_tokenizer() -> tuple[Gemma3ForCausalLM, PreTrainedTokenizer]:
 
 
 class GemmaLLM(LLMProtocol):
-    """
-    LLM implementation for the Gemma 3 4B instruction-tuned model.
+    """LLM implementation for the Gemma 3 4B instruction-tuned model.
 
     This class provides methods for both single-turn text generation
     and conversational chat, leveraging the Hugging Face transformers library.
@@ -40,11 +37,11 @@ class GemmaLLM(LLMProtocol):
     _system_prompt: str | None = None
 
     def set_system_prompt(self, system_prompt: str | None) -> None:
+        """Set the system prompt for the conversation."""
         self._system_prompt = system_prompt
 
     def generate(self, prompt: str) -> str:
-        """
-        Generates a text response for a single, stateless prompt.
+        """Generates a text response for a single, stateless prompt.
 
         Args:
             prompt: The input text to the model.
@@ -52,13 +49,14 @@ class GemmaLLM(LLMProtocol):
         Returns:
             The generated text response as a string.
         """
-        return self.chat([
-            ChatMessage(role="user", content=prompt),
-        ])
+        return self.chat(
+            [
+                ChatMessage(role="user", content=prompt),
+            ]
+        )
 
-    def chat(self, messages: List[ChatMessage]) -> str:
-        """
-        Generates a response for a conversational chat history.
+    def chat(self, messages: list[ChatMessage]) -> str:
+        """Generates a response for a conversational chat history.
 
         Args:
             messages: A list of ChatMessage objects representing the conversation history.
@@ -80,7 +78,7 @@ class GemmaLLM(LLMProtocol):
             first_message = processed_messages[0].copy()
 
             # Prepend the system prompt to the content of the copied first message
-            first_message['content'] = f"{self._system_prompt}\n\n{first_message['content']}"
+            first_message["content"] = f"{self._system_prompt}\n\n{first_message['content']}"
 
             # Replace the first message in our new list with the modified copy
             processed_messages[0] = first_message
@@ -94,7 +92,7 @@ class GemmaLLM(LLMProtocol):
             prompt,
             return_tensors="pt",
             truncation=True,
-            max_length=MAX_CONTEXT_TOKENS - MAX_NEW_TOKENS
+            max_length=MAX_CONTEXT_TOKENS - MAX_NEW_TOKENS,
         ).to(model.device)
 
         # Generate a response

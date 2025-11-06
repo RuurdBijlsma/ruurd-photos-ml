@@ -1,14 +1,15 @@
 # llm/protocol.py
 
 from enum import StrEnum, auto
-from typing import List, Protocol, TypedDict
+from typing import Protocol, TypedDict
 
 
 class ChatMessage(TypedDict):
-    """
-    Represents a single message in a chat conversation.
+    """Represents a single message in a chat conversation.
+
     The 'role' can be 'user', 'assistant'.
     """
+
     role: str
     content: str
 
@@ -17,8 +18,7 @@ class LLMProtocol(Protocol):
     """A protocol defining the interface for a Large Language Model."""
 
     def generate(self, prompt: str) -> str:
-        """
-        Generates a text response for a single, stateless prompt.
+        """Generates a text response for a single, stateless prompt.
 
         Args:
             prompt: The input text to the model.
@@ -28,9 +28,8 @@ class LLMProtocol(Protocol):
         """
         ...
 
-    def chat(self, messages: List[ChatMessage]) -> str:
-        """
-        Generates a response for a conversational chat history.
+    def chat(self, messages: list[ChatMessage]) -> str:
+        """Generates a response for a conversational chat history.
 
         Args:
             messages: A list of ChatMessage objects representing the conversation history.

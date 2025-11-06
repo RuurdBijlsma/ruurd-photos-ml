@@ -1,15 +1,13 @@
 """Tests for ruurd_photos_ml."""
 
-from typing import List
-
 import numpy as np
 import pytest
 
 from ruurd_photos_ml import (
     CaptionerProvider,
+    ChatMessage,
     EmbedderProvider,
     FacialRecognitionProvider,
-    LLMProvider,
     ObjectDetectionProvider,
     OCRProvider,
     get_captioner,
@@ -17,7 +15,7 @@ from ruurd_photos_ml import (
     get_facial_recognition,
     get_llm,  # Import the new getter
     get_object_detection,
-    get_ocr, ChatMessage,
+    get_ocr,
 )
 from tests.helpers.get_test_image import get_test_image
 
@@ -139,7 +137,7 @@ def test_gemma_llm() -> None:
 
     # 3. Test the conversational `chat` method to ensure it remembers context
     # Turn 1: Provide a piece of information
-    messages: List[ChatMessage] = [
+    messages: list[ChatMessage] = [
         {"role": "user", "content": "My favorite programming language is Rust."}
     ]
     response_chat_1 = llm.chat(messages)

@@ -17,7 +17,7 @@ from ruurd_photos_ml.analysis.facial_recognition.protocol import (
     FacialRecognitionProvider,
 )
 from ruurd_photos_ml.analysis.llm.gemma_llm import GemmaLLM
-from ruurd_photos_ml.analysis.llm.protocol import LLMProvider, LLMProtocol
+from ruurd_photos_ml.analysis.llm.protocol import LLMProtocol, LLMProvider
 from ruurd_photos_ml.analysis.object_detection.protocol import (
     ObjectDetectionProtocol,
     ObjectDetectionProvider,
