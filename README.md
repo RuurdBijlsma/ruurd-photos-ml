@@ -3,68 +3,50 @@
 [![Python Quality Checks](https://github.com/RuurdBijlsma/ruurd-photos-ml/actions/workflows/quality-checks.yaml/badge.svg)](https://github.com/RuurdBijlsma/ruurd-photos-ml/actions/workflows/quality-checks.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A Python package providing a suite of machine learning tools for image analysis, designed to be the
-backbone of the [Ruurd Photos](https://github.com/RuurdBijlsma/photos-backend) project, a
-self-hosted
-Google Photos alternative. This package is intended to be called from Rust
-using [PyO3](https://pyo3.rs/).
+Ruurd Photos ML is a Python package providing machine learning tools for image analysis. It serves as the backend for the [Ruurd Photos](https://github.com/RuurdBijlsma/photos-backend) project and is designed to be integrated with Rust applications using [PyO3](https://pyo3.rs/).
 
-## ✨ Features
+## Features
 
-This library offers a selection of pre-trained models for various image analysis tasks:
+This library provides interfaces for the following pre-trained models:
 
-### <caption> Image Captioning
+### Image Captioning
+Generates descriptive captions for images and supports visual question answering.
+* **InstructBLIP**: Generates detailed descriptions and answers questions about image content.
+* **Salesforce BLIP**: Generates standard high-quality image captions.
 
-Generate descriptive captions for images and ask questions about their content.
+### Facial Recognition
+Detects and analyzes faces within images.
+* **InsightFace**: A toolkit used for:
+    * Multi-face detection.
+    * Age and gender estimation.
+    * Facial landmark identification (eyes, nose, mouth).
+    * Facial embedding generation for clustering and recognition.
 
-* **InstructBLIP**: A powerful model for both generating detailed descriptions and answering
-  questions about an image.
-* **Salesforce BLIP**: A robust model for generating high-quality image captions.
+### Object Detection
+Identifies and locates objects within an image.
+* **ResNet**: Detects common objects and returns associated labels and bounding boxes.
 
-### 😀 Facial Recognition
+### Optical Character Recognition (OCR)
+Detects and extracts text from images.
+* **ResNet & Tesseract**: A two-stage pipeline. ResNet first determines if an image contains legible text; Tesseract then extracts the text and bounding boxes.
 
-Detect and analyze faces within images.
+## Installation
 
-* **InsightFace**: A comprehensive toolkit for face analysis that can:
-    * Detect multiple faces in an image.
-    * Estimate age and gender.
-    * Identify key facial landmarks (eyes, nose, mouth).
-    * Generate facial embeddings for clustering and recognition.
-
-### 🖼️ Object Detection
-
-Identify and locate various objects within an image.
-
-* **ResNet**: Utilizes a ResNet-based model to detect a wide range of common objects, returning
-  their labels and bounding boxes.
-
-### 🔤 Optical Character Recognition (OCR)
-
-Detect and extract text from images.
-
-* **ResNet & Tesseract**: A two-stage process that first uses a ResNet model to determine if an
-  image contains legible text, and then employs Tesseract to extract the text and its bounding
-  boxes.
-
-## 🚀 Installation
-
-This package will be available on PyPI. You can install it using pip:
+Install the package via pip:
 
 ```bash
 pip install ruurd-photos-ml
 ```
 
-## 💻 Usage
+## Usage
 
-The library is designed to be simple to use. Here are some examples for each of the main
-functionalities.
+The following examples demonstrate the main functionalities of the library.
 
-First, you'll need to load an image using Pillow:
+**Prerequisite: Loading an Image**
 
 ```python
 from PIL import Image
 
-# Load your image
 image = Image.open("path/to/your/image.jpg")
 ```
 
@@ -76,11 +58,11 @@ from ruurd_photos_ml import get_captioner, CaptionerProvider
 # Initialize the captioner
 captioner = get_captioner(CaptionerProvider.BLIP_INSTRUCT)
 
-# Generate a simple caption
+# Generate a caption
 caption = captioner.caption(image)
 print(f"Caption: {caption}")
 
-# Ask a question about the image
+# Visual Question Answering
 question = "What color is the main object?"
 answer = captioner.caption(image, instruction=question)
 print(f"Answer: {answer}")
@@ -94,14 +76,14 @@ from ruurd_photos_ml import get_facial_recognition, FacialRecognitionProvider
 # Initialize the facial recognition model
 face_detector = get_facial_recognition(FacialRecognitionProvider.INSIGHT)
 
-# Get faces from the image
+# Detect faces
 faces = face_detector.get_faces(image)
 
 for face in faces:
-    print(f"Found a face at position {face.position} with confidence {face.confidence}")
+    print(f"Position: {face.position}, Confidence: {face.confidence}")
     print(f"  - Age: {face.age}")
     print(f"  - Gender: {face.sex}")
-    print(f"  - Embedding: {face.embedding[:5]}...")  # Showing first 5 values
+    print(f"  - Embedding: {face.embedding[:5]}...")
 ```
 
 ### Object Detection
@@ -112,7 +94,7 @@ from ruurd_photos_ml import get_object_detection, ObjectDetectionProvider
 # Initialize the object detector
 object_detector = get_object_detection(ObjectDetectionProvider.RESNET)
 
-# Detect objects in the image
+# Detect objects
 objects = object_detector.detect_objects(image)
 
 for obj in objects:
@@ -127,22 +109,21 @@ from ruurd_photos_ml import get_ocr, OCRProvider
 # Initialize the OCR model
 ocr = get_ocr(OCRProvider.RESNET_TESSERACT)
 
-# Check for legible text
+# Check for legible text before extraction
 if ocr.has_legible_text(image):
-    # Extract text (specify languages for better accuracy)
+    # Extract text string
     text = ocr.get_text(image, languages=("eng", "nld"))
     print(f"Extracted Text: {text}")
 
-    # Get text with bounding boxes
+    # Extract text with bounding boxes
     boxes = ocr.get_boxes(image, languages=("eng", "nld"))
     for box in boxes:
         print(f"Found text: '{box.text}' at position {box.position}")
-
 ```
 
-## 🛠️ Development
+## Development
 
-To contribute to this project, you can set up a local development environment.
+Follow these steps to set up a local development environment.
 
 1. **Clone the repository:**
    ```bash
@@ -150,32 +131,27 @@ To contribute to this project, you can set up a local development environment.
    cd ruurd-photos-ml
    ```
 
-2. **Install dependencies using `uv`:**
+2. **Install dependencies:**
+   This project uses `uv` for dependency management.
    ```bash
    uv sync --all-extras --dev
    ```
 
-3**Run tests:**
-
+3. **Run tests:**
    ```bash
    uv run pytest
    ```
 
-3**Quality checks:**
-
+4. **Run quality checks:**
    ```bash
    pre-commit run -a
    ```
 
-## 🔗 Project Links
+## Project Links
 
-* **Homepage
-  **: [https://github.com/RuurdBijlsma/ruurd-photos-ml](https://github.com/RuurdBijlsma/ruurd-photos-ml)
-* **Repository
-  **: [https://github.com/RuurdBijlsma/ruurd-photos-ml](https://github.com/RuurdBijlsma/ruurd-photos-ml)
-* **Documentation
-  **: [https://ruurdbijlsma.github.io/ruurd-photos-ml](https://ruurdbijlsma.github.io/ruurd-photos-ml)
+* [Repository](https://github.com/RuurdBijlsma/ruurd-photos-ml)
+* [Documentation](https://ruurdbijlsma.github.io/ruurd-photos-ml)
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License.
